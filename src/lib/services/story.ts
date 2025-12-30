@@ -19,6 +19,7 @@ export interface Story {
   // Progress
   completed?: boolean;
   best_score?: number;
+  comprehension_score?: number; // Alias for best_score used in UI
   last_read_at?: string;
 
   // Extra
@@ -172,6 +173,8 @@ CORRECT: [A, B, C, or D]
       questions: story.questions as unknown as ComprehensionQuestion[],
       created_at: story.created_at,
       completed: false,
+      best_score: 0,
+      comprehension_score: 0,
     };
   } catch (error) {
     console.error("Error generating story:", error);
@@ -276,19 +279,21 @@ export async function getStories(): Promise<Story[]> {
 
     if (error) return [];
 
-    return (data as any[]).map((s) => ({
+    return (data as unknown as Record<string, unknown>[]).map((s) => ({
       id: String(s.id),
-      title: s.title,
-      content: s.content,
-      difficulty: s.difficulty,
-      category: s.category,
-      topic: s.category,
-      questions: s.questions,
-      created_at: s.created_at,
-      image_url: s.image_url,
-      audio_url: s.audio_url,
+      title: s.title as string,
+      content: s.content as string,
+      difficulty: s.difficulty as "Beginner" | "Intermediate" | "Advanced",
+      category: s.category as string,
+      topic: s.category as string,
+      questions: s.questions as unknown as ComprehensionQuestion[],
+      created_at: s.created_at as string,
+      image_url: s.image_url as string,
+      audio_url: s.audio_url as string,
       completed: false,
-      word_count: s.content.length / 5, // Approx if not stored
+      best_score: 0,
+      comprehension_score: 0,
+      word_count: (s.content as string).length / 5, // Approx if not stored
     }));
   }
 
@@ -312,22 +317,30 @@ export async function getStories(): Promise<Story[]> {
     return [];
   }
 
-  return (data as any[]).map((item) => ({
+  return (data as unknown as Record<string, unknown>[]).map((item) => ({
     id: String(item.id),
-    title: item.title,
-    content: item.content,
-    difficulty: item.difficulty,
-    category: item.category,
-    topic: item.category,
-    questions: item.questions,
-    created_at: item.created_at,
-    image_url: item.image_url,
-    audio_url: item.audio_url,
+    title: item.title as string,
+    content: item.content as string,
+    difficulty: item.difficulty as "Beginner" | "Intermediate" | "Advanced",
+    category: item.category as string,
+    topic: item.category as string,
+    questions: item.questions as unknown as ComprehensionQuestion[],
+    created_at: item.created_at as string,
+    image_url: item.image_url as string,
+    audio_url: item.audio_url as string,
 
-    completed: item.user_story_progress?.[0]?.completed || false,
-    best_score: item.user_story_progress?.[0]?.best_score || 0,
-    last_read_at: item.user_story_progress?.[0]?.last_read_at,
-    word_count: item.content.split(/\s+/).length, // Approx
+    completed:
+      ((item.user_story_progress as Record<string, unknown>[])?.[0]
+        ?.completed as boolean) || false,
+    best_score:
+      ((item.user_story_progress as Record<string, unknown>[])?.[0]
+        ?.best_score as number) || 0,
+    comprehension_score:
+      ((item.user_story_progress as Record<string, unknown>[])?.[0]
+        ?.best_score as number) || 0,
+    last_read_at: (item.user_story_progress as Record<string, unknown>[])?.[0]
+      ?.last_read_at as string,
+    word_count: (item.content as string).split(/\s+/).length, // Approx
   }));
 }
 
@@ -372,6 +385,7 @@ export async function getStory(storyId: string): Promise<Story | null> {
 
     completed: data.user_story_progress?.[0]?.completed || false,
     best_score: data.user_story_progress?.[0]?.best_score || 0,
+    comprehension_score: data.user_story_progress?.[0]?.best_score || 0,
     last_read_at: data.user_story_progress?.[0]?.last_read_at,
   };
 }
@@ -394,10 +408,12 @@ export async function getStoryVocabulary(
     return [];
   }
 
-  return (data as any[]).map((item) => ({
-    ...item,
+  return (data as unknown as Record<string, unknown>[]).map((item) => ({
     id: String(item.id),
     story_id: String(item.story_id),
+    word: item.word as string,
+    definition: item.definition as string,
+    context: item.context as string,
   }));
 }
 

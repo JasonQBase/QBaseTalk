@@ -242,7 +242,7 @@ export default function StoriesPage() {
                     <div className="text-muted-foreground flex items-center gap-4 text-sm">
                       <span className="flex items-center gap-1">
                         <Clock className="h-4 w-4" />
-                        {Math.ceil(story.word_count / 200)} min read
+                        {Math.ceil((story.word_count || 0) / 200)} min read
                       </span>
                       {story.topic && (
                         <span className="text-primary">#{story.topic}</span>

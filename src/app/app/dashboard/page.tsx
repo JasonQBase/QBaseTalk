@@ -19,18 +19,6 @@ import { StreakCalendar } from "@/components/features/StreakCalendar";
 
 // ... (skipping unchanged imports)
 
-{
-  /* Study Streak Calendar */
-}
-<motion.div
-  initial={{ opacity: 0, x: 20 }}
-  animate={{ opacity: 1, x: 0 }}
-  transition={{ delay: 0.25 }}
->
-  <Card className="p-6">
-    <StreakCalendar />
-  </Card>
-</motion.div>;
 import { StreakCounter } from "@/components/features/StreakCounter";
 import { type DailyChallenge } from "@/lib/services/challenge";
 import { WordOfDayCard } from "@/components/features/WordOfDayCard";
